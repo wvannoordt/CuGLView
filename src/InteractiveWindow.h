@@ -19,6 +19,7 @@ namespace CuGLView
             void Setup(void);
             void Run(void);
             void OnDisplay(void);
+            void SetFill(int fillValue);
             ~InteractiveWindow(void);
         private:
             void SetBindings(void);

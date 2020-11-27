@@ -2,22 +2,22 @@
 #include "WindowState.h"
 #include "SimpleKernels.h"
 namespace CuGLView
-{    
+{
     InteractiveWindow::InteractiveWindow(int width_in, int height_in)
     {
         Build(width_in, height_in, "window", false);
     }
-    
+
     InteractiveWindow::InteractiveWindow(int width_in, int height_in, bool allowOutput_in)
     {
         Build(width_in, height_in, "window", allowOutput_in);
     }
-    
+
     InteractiveWindow::InteractiveWindow(int width_in, int height_in, std::string title_in)
     {
         Build(width_in, height_in, title_in, false);
     }
-    
+
     InteractiveWindow::InteractiveWindow(int width_in, int height_in, std::string title_in, bool allowOutput_in)
     {
         Build(width_in, height_in, title_in, allowOutput_in);
@@ -38,7 +38,7 @@ namespace CuGLView
         backFill = 0xffffffff;
         WriteLine("Created window \"" + title + "\" with size " + std::to_string(height) + " x " + std::to_string(width) + ".");
     }
-    
+
     void InteractiveWindow::Setup(void)
     {
         WriteLine("Setup window... ");
@@ -49,13 +49,18 @@ namespace CuGLView
         InitializePixelBuffer();
         WriteLine("Done");
     }
-    
+
+    void InteractiveWindow::SetFill(int fillValue)
+    {
+        backFill = fillValue;
+    }
+
     void InteractiveWindow::SetBindings(void)
     {
         SetGlobalWindow(this);
         glutDisplayFunc(GlobalOnDisplay);
     }
-    
+
     void InteractiveWindow::Run(void)
     {
         if (useGLUT)
@@ -64,7 +69,7 @@ namespace CuGLView
             glutMainLoop();
         }
     }
-    
+
     void InteractiveWindow::OnDisplay(void)
     {
         int* oglDeviceBuf = 0;
@@ -75,14 +80,14 @@ namespace CuGLView
         DrawTexture();
         if (useGLUT) glutSwapBuffers();
     }
-    
+
     void InteractiveWindow::ComputePixelBuffer(int* devicePixelBuffer)
     {
         totalFrames++;
         WriteLine(std::to_string(totalFrames));
         FillBuffer(devicePixelBuffer, backFill, height, width);
     }
-    
+
     void InteractiveWindow::DrawTexture(void)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -95,7 +100,7 @@ namespace CuGLView
         glEnd();
         glDisable(GL_TEXTURE_2D);
     }
-    
+
     void InteractiveWindow::InitializePixelBuffer(void)
     {
         pixelBufferInitialized = true;
@@ -107,12 +112,12 @@ namespace CuGLView
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         cudaGraphicsGLRegisterBuffer(&cuda_pbo_resource, pbo, cudaGraphicsMapFlagsWriteDiscard);
     }
-    
+
     void InteractiveWindow::SetOrthogonal(void)
     {
         gluOrtho2D(0, width, height, 0);
     }
-    
+
     void InteractiveWindow::InitializeGLUT(void)
     {
         glutInit(&dummyArgC, dummyArgV);
@@ -123,7 +128,7 @@ namespace CuGLView
         glewInit();
 #endif
     }
-    
+
     void InteractiveWindow::Destroy(void)
     {
         if (pixelBufferInitialized && hasRun)
@@ -139,12 +144,12 @@ namespace CuGLView
             }
         }
     }
-    
+
     InteractiveWindow::~InteractiveWindow(void)
     {
         Destroy();
     }
-    
+
     void InteractiveWindow::Write(std::string message)
     {
         if (allowOutput)
@@ -152,7 +157,7 @@ namespace CuGLView
             std::cout << writeStyle << message;
         }
     }
-    
+
     void InteractiveWindow::WriteLine(std::string message)
     {
         if (allowOutput)
